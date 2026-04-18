@@ -3,6 +3,7 @@ mod ciphers;
 mod emergency_access;
 mod events;
 mod folders;
+mod hibp;
 mod organizations;
 mod public;
 mod sends;
@@ -136,6 +137,11 @@ async fn put_eq_domains(data: Json<EquivDomainData>, headers: Headers, conn: DbC
 
 #[get("/hibp/breach?<username>")]
 async fn hibp_breach(username: &str, _headers: Headers) -> JsonResult {
+    let provider = CONFIG.breach_provider().to_lowercase();
+    if provider != "hibp" {
+        return hibp::fallback_breach(username).await;
+    }
+
     let username: String = url::form_urlencoded::byte_serialize(username.as_bytes()).collect();
     if let Some(api_key) = CONFIG.hibp_api_key() {
         let url = format!(

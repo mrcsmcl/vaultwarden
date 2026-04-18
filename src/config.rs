@@ -592,6 +592,10 @@ make_config! {
 
         /// HIBP Api Key |> HaveIBeenPwned API Key, request it here: https://haveibeenpwned.com/API/Key
         hibp_api_key:           Pass,   true,   option;
+        /// Breach provider |> The provider used for breach detection. Options: "hibp", "hibp_unifiedsearch", "xposedornot"
+        breach_provider:        String, true,   def,    "hibp".to_string();
+        /// Enable breach provider fallback |> If the primary provider fails, attempt to use the secondary automated providers.
+        enable_hibp_fallback:   bool,   true,   def,    true;
 
         /// Per-user attachment storage limit (KB) |> Max kilobytes of attachment storage allowed per user. When this limit is reached, the user will not be allowed to upload further attachments.
         user_attachment_limit:  i64,    true,   option;

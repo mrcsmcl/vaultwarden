@@ -56,6 +56,18 @@ A nearly complete implementation of the Bitwarden Client API is provided, includ
 
 <br>
 
+## Fork Customizations
+
+> [!IMPORTANT]
+> ### Breach Provider System
+> The vaultwarden fork includes an extended breach provider system. Users can configure the preferred provider via the breach_provider setting. Supported providers include HaveIBeenPwned (default), HaveIBeenPwned Unified Search, and XposedOrNot.
+> ### Image Registry
+> Container images are automatically built and pushed to the GitHub Container Registry. Images are available at ghcr.io/mrcsmcl/vaultwarden and support multiple architectures (amd64, arm64, arm/v7, arm/v6).
+> ### Automatic Sync
+> The fork maintains synchronization with the upstream repository via a daily automated workflow. This ensures that the latest security patches and features from the main project are integrated regularly.
+
+<br>
+
 ## Usage
 
 > [!IMPORTANT]

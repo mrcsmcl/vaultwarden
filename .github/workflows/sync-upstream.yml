@@ -1,0 +1,97 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    # Run every day at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  sync:
+    name: Sync with upstream dani-garcia/vaultwarden
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote and fetch
+        run: |
+          git remote add upstream https://github.com/dani-garcia/vaultwarden.git
+          git fetch upstream main
+
+      - name: Check if sync is needed
+        id: check
+        run: |
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "Already up to date. No sync needed."
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Upstream has new commits. Sync needed."
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create sync branch and merge
+        if: steps.check.outputs.needed == 'true'
+        id: merge
+        run: |
+          BRANCH="sync-upstream-$(date +%Y%m%d)"
+          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+
+          git checkout -b "${BRANCH}"
+
+          if git merge upstream/main --no-edit; then
+            echo "Clean merge succeeded."
+            echo "merge_status=success" >> "$GITHUB_OUTPUT"
+          else
+            echo "Merge conflicts detected. Committing with conflict markers."
+            git add -A
+            git commit -m "chore: merge upstream/main (conflicts require manual resolution)"
+            echo "merge_status=conflict" >> "$GITHUB_OUTPUT"
+          fi
+
+          git push origin "${BRANCH}"
+
+      - name: Create Pull Request
+        if: steps.check.outputs.needed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.merge.outputs.branch }}
+          MERGE_STATUS: ${{ steps.merge.outputs.merge_status }}
+        run: |
+          if [ "${MERGE_STATUS}" = "conflict" ]; then
+            TITLE="⚠️ Sync upstream $(date +%Y-%m-%d) — conflicts detected"
+            BODY="## Automatic sync with upstream [dani-garcia/vaultwarden](https://github.com/dani-garcia/vaultwarden)
+
+          ⚠️ **Merge conflicts were detected.** Manual resolution is required before merging this PR.
+
+          1. Check out the branch \`${BRANCH}\`
+          2. Resolve the conflict markers
+          3. Push the resolved commits
+          4. Approve and merge this PR"
+          else
+            TITLE="🔄 Sync upstream $(date +%Y-%m-%d) — clean merge"
+            BODY="## Automatic sync with upstream [dani-garcia/vaultwarden](https://github.com/dani-garcia/vaultwarden)
+
+          ✅ **Clean merge.** Review the changes and approve to update \`main\`.
+
+          Merging this PR will automatically trigger a new Docker image build."
+          fi
+
+          gh pr create \
+            --title "${TITLE}" \
+            --body "${BODY}" \
+            --base main \
+            --head "${BRANCH}" \
+            || echo "PR already exists for branch ${BRANCH}, skipping creation."
