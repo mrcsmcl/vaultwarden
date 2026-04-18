@@ -111,6 +111,8 @@ impl Fairing for AppHeaders {
                     {allowed_iframe_ancestors}; \
                     img-src 'self' data: \
                     https://haveibeenpwned.com \
+                    https://logos.haveibeenpwned.com \
+                    https://xposedornot.com \
                     {icon_service_csp}; \
                     connect-src 'self' \
                     https://api.pwnedpasswords.com \

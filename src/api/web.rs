@@ -202,7 +202,7 @@ pub async fn _static_files_dev(filename: PathBuf) -> Option<NamedFile> {
     let file = filename.to_str().unwrap_or_default();
     let ext = filename.extension().unwrap_or_default();
 
-    let path = if ext == "png" || ext == "svg" {
+    let path = if ext == "png" || ext == "svg" || ext == "jpg" {
         tokio::fs::canonicalize(Path::new(file!()).parent().unwrap().join("../static/images/").join(file)).await
     } else {
         tokio::fs::canonicalize(Path::new(file!()).parent().unwrap().join("../static/scripts/").join(file)).await
@@ -223,6 +223,7 @@ pub fn static_files(filename: &str) -> Result<(ContentType, &'static [u8]), Erro
         "error-x.svg" => Ok((ContentType::SVG, include_bytes!("../static/images/error-x.svg"))),
         "hibp.png" => Ok((ContentType::PNG, include_bytes!("../static/images/hibp.png"))),
         "vaultwarden-icon.png" => Ok((ContentType::PNG, include_bytes!("../static/images/vaultwarden-icon.png"))),
+        "fallback.jpg" => Ok((ContentType::JPEG, include_bytes!("../static/images/fallback.jpg"))),
         "vaultwarden-favicon.png" => Ok((ContentType::PNG, include_bytes!("../static/images/vaultwarden-favicon.png"))),
         "404.css" => Ok((ContentType::CSS, include_bytes!("../static/scripts/404.css"))),
         "admin.css" => Ok((ContentType::CSS, include_bytes!("../static/scripts/admin.css"))),

@@ -43,7 +43,7 @@ pub async fn fallback_breach(username: &str) -> JsonResult {
                                 "breachDate": "1970-01-01T00:00:00Z",
                                 "addedDate": "1970-01-01T00:00:00Z",
                                 "description": msg,
-                                "logoPath": "vw_static/hibp.png",
+                                "logoPath": "vw_static/fallback.jpg",
                                 "pwnCount": 0,
                                 "dataClasses": ["System Alert"]
                             }),
@@ -65,7 +65,7 @@ pub async fn fallback_breach(username: &str) -> JsonResult {
                             "breachDate": "1970-01-01T00:00:00Z",
                             "addedDate": "1970-01-01T00:00:00Z",
                             "description": msg,
-                            "logoPath": "vw_static/hibp.png",
+                            "logoPath": "vw_static/fallback.jpg",
                             "pwnCount": 0,
                             "dataClasses": ["System Alert"]
                         }])));
@@ -93,7 +93,7 @@ pub async fn fallback_breach(username: &str) -> JsonResult {
                                 "breachDate": "1970-01-01T00:00:00Z",
                                 "addedDate": "1970-01-01T00:00:00Z",
                                 "description": msg,
-                                "logoPath": "vw_static/hibp.png",
+                                "logoPath": "vw_static/fallback.jpg",
                                 "pwnCount": 0,
                                 "dataClasses": ["System Alert"]
                             }),
@@ -115,7 +115,7 @@ pub async fn fallback_breach(username: &str) -> JsonResult {
                             "breachDate": "1970-01-01T00:00:00Z",
                             "addedDate": "1970-01-01T00:00:00Z",
                             "description": msg,
-                            "logoPath": "vw_static/hibp.png",
+                            "logoPath": "vw_static/fallback.jpg",
                             "pwnCount": 0,
                             "dataClasses": ["System Alert"]
                         }])));
@@ -176,9 +176,11 @@ async fn fetch_xposedornot(username: &str) -> Result<Vec<Value>, u16> {
                 .filter(|s| !s.is_empty())
                 .collect();
 
+            let breach_name = b.get("breach").and_then(|v| v.as_str()).unwrap_or("Unknown");
+
             json!({
-                "name": b.get("breach").and_then(|v| v.as_str()).unwrap_or("Unknown"),
-                "title": b.get("breach").and_then(|v| v.as_str()).unwrap_or("Unknown"),
+                "name": breach_name,
+                "title": breach_name,
                 "domain": b.get("domain").and_then(|v| v.as_str()).unwrap_or(""),
                 "breachDate": breach_date,
                 "addedDate": added_date,
