@@ -736,7 +736,7 @@ where
 
                 warn!("Can't connect to database, retrying: {e:?}");
 
-                sleep(Duration::from_millis(1_000)).await;
+                sleep(Duration::from_secs(1)).await;
             }
         }
     }

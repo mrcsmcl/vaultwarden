@@ -1463,7 +1463,7 @@ async fn _confirm_invite(
     let save_result = member_to_confirm.save(conn).await;
 
     if let Some(user) = User::find_by_uuid(&member_to_confirm.user_uuid, conn).await {
-        nt.send_user_update(UpdateType::SyncOrgKeys, &user, &headers.device.push_uuid, conn).await;
+        nt.send_user_update(UpdateType::SyncOrgKeys, &user, headers.device.push_uuid.as_ref(), conn).await;
     }
 
     save_result
@@ -1721,7 +1721,7 @@ async fn _delete_member(
     .await;
 
     if let Some(user) = User::find_by_uuid(&member_to_delete.user_uuid, conn).await {
-        nt.send_user_update(UpdateType::SyncOrgKeys, &user, &headers.device.push_uuid, conn).await;
+        nt.send_user_update(UpdateType::SyncOrgKeys, &user, headers.device.push_uuid.as_ref(), conn).await;
     }
 
     member_to_delete.delete(conn).await
@@ -1979,7 +1979,7 @@ async fn list_policies_token(org_id: OrganizationId, token: &str, conn: DbConn) 
 }
 
 // Called during the SSO enrollment return the default policy
-#[get("/organizations/vaultwarden-dummy-oidc-identifier/policies/master-password", rank = 1)]
+#[get("/organizations/00000000-01DC-01DC-01DC-000000000000/policies/master-password", rank = 1)]
 fn get_dummy_master_password_policy() -> JsonResult {
     let (enabled, data) = match CONFIG.sso_master_password_policy_value() {
         Some(policy) if CONFIG.sso_enabled() => (true, policy.to_string()),
